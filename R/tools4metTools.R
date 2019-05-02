@@ -1,4 +1,9 @@
 #-----------------------------------------------------------------------------
+#' @title removeNoise
+#' @param spec 
+#' @param mz.tol 
+#' @export
+
 setGeneric(name = "removeNoise",
            def = function(spec, mz.tol = 30){
              spec <- matrix(spec, ncol = 2)
@@ -53,6 +58,10 @@ setGeneric(name = "removeNoise",
 #@param ... other parameters
 #@export
 #'
+#'
+#-----------------------------------------------------------------------------
+#' @title GetMatchResult
+#' @export
 
 GetMatchResult <- function(spec.exp, spec.lib,
                            weight.int = 1,
@@ -107,7 +116,8 @@ GetMatchResult <- function(spec.exp, spec.lib,
 #@param direction direction
 #@export
 #'
-
+#' @title GetSpec2Match
+#' @export
 GetSpec2Match <- function(spec.exp, spec.lib,
                           ppm.ms2match = 30,
                           mz.ppm.thr = 400,
@@ -147,7 +157,8 @@ GetSpec2Match <- function(spec.exp, spec.lib,
 #@param temp temp
 #@export
 #'
-
+#' @title MatchFromTemp
+#' @export
 MatchFromTemp <- function(spec, temp) {
   temp[match(spec[, 'mz'], temp[, 'mz']), 'intensity'] <- spec[, 'intensity']
   temp
@@ -168,7 +179,8 @@ MatchFromTemp <- function(spec, temp) {
 #@export
 #'
 
-
+#' @title MatchSpec
+#' @export
 MatchSpec <- function(spec, ppm.ms2match = 30, mz.ppm.thr = 400) {
   while (TRUE) {
     mz.diff.ppm <- GetDiffMZppm(spec[, 'mz'], mz.ppm.thr = mz.ppm.thr)
@@ -197,7 +209,8 @@ MatchSpec <- function(spec, ppm.ms2match = 30, mz.ppm.thr = 400) {
 #@param mz mz
 #@param mz.ppm.thr mz.ppm.thr
 #@export
-
+#' @title GetDiffMZppm
+#' @export
 GetDiffMZppm <- function(mz, mz.ppm.thr = NULL) {
   mz.diff <- diff(mz) / mz[-1] * 1e6
   if (!is.null(mz.ppm.thr)) {
@@ -220,7 +233,8 @@ GetDiffMZppm <- function(mz, mz.ppm.thr = NULL) {
 #@export
 #'
 
-
+#' @title GetWeightedInt
+#' @export
 GetWeightedInt <- function(spec, weight.mz = 0, weight.int = 1) {
   return(spec[, 'mz'] ^ weight.mz * spec[, 'intensity'] ^ weight.int)
 }
@@ -242,7 +256,8 @@ GetDotProduct <- function(x, y) {
 
 
 #-----------------------------------------------------------------------------
-
+#' @title TuneMS2
+#' @export
 TuneMS2 <- function(spec,
                     mz.precursor,
                     is.include.precursor = TRUE,
@@ -309,7 +324,8 @@ TuneMS2 <- function(spec,
 
 
 #-----------------------------------------------------------------------------
-
+#' @title RemoveRingEffect
+#' @export
 RemoveRingEffect <- function(spec, mz.diff.thr = 0.3, int.rel.thr = 0.2) {
   nr.ring <- nrow(spec) + 1
   mz <- spec[, 'mz']
@@ -341,7 +357,8 @@ RemoveRingEffect <- function(spec, mz.diff.thr = 0.3, int.rel.thr = 0.2) {
 
 
 #-----------------------------------------------------------------------------
-
+#' @title NormalizeSpec
+#' @export
 NormalizeSpec <- function(spec, ref = max(abs(spec[, 2])), pos = 'top') {
   spec[, 2] <- spec[, 2] / ref * ifelse(pos == 'down', -1, 1)
   return(spec)
@@ -350,7 +367,8 @@ NormalizeSpec <- function(spec, ref = max(abs(spec[, 2])), pos = 'top') {
 
 
 #-----------------------------------------------------------------------------
-
+#' @title GetRangePPM
+#' @export
 GetRangePPM <- function(data, ppm) {
   t(sapply(data, function(dt) dt * (1 + c(-1, 1) * ppm * 1e-6)))
 }
