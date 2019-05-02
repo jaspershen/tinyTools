@@ -1,0 +1,25 @@
+Package: tidyTools
+Title: All the usefull tools from Xiaotao Shen
+Version: 0.01.01
+Date: 2019-05-01
+Authors@R: c(
+    person("Xiaotao", "Shen", , "shenxt1990@163.com", role = c("aut", "cre"), 
+      comment = c(ORCID = "0000-0002-9608-9964")
+    )
+    )
+Maintainer: Xiaotao Shen<shenxt1990@163.com>
+Description: Small tools of Xiaotao Shen.
+LazyData: true
+Depends: R (>= 3.0)
+Imports:
+License: GPL-2 | file LICENSE
+URL: https://github.com/jaspershen/sxtTools
+RoxygenNote: 6.1.1
+Suggests: knitr,
+    rmarkdown,
+    BiocStyle,
+    RUnit,
+    BiocGenerics,
+    tidyverse,
+    ggplot2
+VignetteBuilder: knitr
