@@ -1,207 +1,4 @@
 #-----------------------------------------------------------------------------
-#' @title removeNoise
-#' @param spec 
-#' @param mz.tol 
-#' @export
-
-setGeneric(name = "removeNoise",
-           def = function(spec, mz.tol = 30){
-             spec <- matrix(spec, ncol = 2)
-             colnames(spec) <- c("mz", "intensity")
-             if(nrow(spec) == 1) return(spec)
-             spec <- spec[order(spec[,1]),]
-             mz <- as.numeric(spec[,1])
-             
-             new.spec <- NULL
-             i = 1
-             while(i < length(mz)){
-               # cat(i); cat(" ")
-               temp.mz <- mz[i]
-               mz.error <- abs(temp.mz - mz)*10^6/ifelse(temp.mz >= 400, temp.mz, 400)
-               temp.idx <- which(mz.error <= mz.tol)
-               temp.spec <- spec[temp.idx,]
-               if(length(temp.idx) == 1) {
-                 new.spec <- rbind(new.spec, temp.spec)
-                 i <- max(temp.idx) + 1
-                 next()
-               }
-               temp.mz <- median(temp.spec[,1])
-               temp.int <- max(temp.spec[,2])
-               new.spec <- rbind(new.spec, c(temp.mz, temp.int))
-               # spec <- spec[-temp.idx,]
-               i <- max(temp.idx) + 1
-             }
-             
-             row.names(new.spec) <- NULL
-             colnames(new.spec) <- c("mz", "intensity")
-             return(new.spec)
-           })
-
-
-
-#-----------------------------------------------------------------------------
-###
-###GetMatchResult
-#@title GetMatchResult
-#@description GetMatchResult
-#@author Hao Li, Yandong Yin, Kai Weng
-#\email{shenxt@@sioc.ac.cn}
-#@param spec.exp spec.exp
-#@param spec.lib spec.lib
-#@param weight.int weight.int
-#@param weight.mz weight.mz
-#@param ppm.ms2match ppm.ms2match
-#@param mz.ppm.thr mz.ppm.thr
-#@param ppm.sanity.check ppm.sanity.check
-#@param is.sanity.check is.sanity.check
-#@param direction direction
-#@param ... other parameters
-#@export
-#'
-#'
-#-----------------------------------------------------------------------------
-#' @title GetMatchResult
-#' @export
-
-GetMatchResult <- function(spec.exp, spec.lib,
-                           weight.int = 1,
-                           weight.mz = 0,
-                           ppm.ms2match = 30,
-                           mz.ppm.thr = 400,
-                           ppm.sanity.check = 100,
-                           is.sanity.check = FALSE,
-                           direction = direction,
-                           ...) {
-  # ()
-  if (is.sanity.check) {
-    switch(direction,
-           'forward' = {
-             if (any(c(GetDiffMZppm(spec.exp[, 'mz']), GetDiffMZppm(spec.lib[, 'mz'])) <= ppm.sanity.check)) {
-               stop('Difference between m/z is too small!!')
-             }
-           },
-           'reverse' = {
-             if (any(GetDiffMZppm(spec.lib) <= ppm.sanity.check)) {
-               stop('Difference between m/z is too small!!')
-             }
-           },
-           stop('Error setup for parameter: direction!!!'))
-  }
-  #
-  spec2match <- GetSpec2Match(spec.exp, spec.lib,
-                              ppm.ms2match = ppm.ms2match,
-                              mz.ppm.thr = mz.ppm.thr,
-                              direction = direction)
-  int.weighted.pk  <- GetWeightedInt(spec2match$exp, weight.mz, weight.int)
-  int.weighted.lib <- GetWeightedInt(spec2match$lib, weight.mz, weight.int)
-  match.score <- GetDotProduct(int.weighted.pk, int.weighted.lib)
-  attr(match.score, 'spec') <- spec2match
-  attr(match.score, 'spec.compared') <- cbind('exp' = int.weighted.pk,
-                                              'lib' = int.weighted.lib)
-  return(match.score)
-}
-
-
-
-#-----------------------------------------------------------------------------
-###GetSpec2Match
-#@title GetSpec2Match
-#@description GetSpec2Match
-#@author Hao Li, Yandong Yin, Kai Weng
-#\email{shenxt@@sioc.ac.cn}
-#@param spec.exp spec.exp
-#@param spec.lib spec.lib
-#@param ppm.ms2match ppm.ms2match
-#@param mz.ppm.thr mz.ppm.thr
-#@param direction direction
-#@export
-#'
-#' @title GetSpec2Match
-#' @export
-GetSpec2Match <- function(spec.exp, spec.lib,
-                          ppm.ms2match = 30,
-                          mz.ppm.thr = 400,
-                          direction = c('reverse', 'forward')) {
-  #
-  direction = match.arg(direction)
-  mz.pool   <- sort(c(spec.exp[, 'mz'], spec.lib[, 'mz']))
-  spec.temp <- cbind('mz' = mz.pool, 'intensity' = 0)
-  
-  spec.exp.temp  <- MatchFromTemp(spec.exp, spec.temp)
-  spec.lib.temp <- MatchFromTemp(spec.lib, spec.temp)
-  
-  # combine nearby peaks
-  pk.spec  <- MatchSpec(spec.exp.temp,  ppm.ms2match = ppm.ms2match, mz.ppm.thr = mz.ppm.thr)
-  lib.spec <- MatchSpec(spec.lib.temp, ppm.ms2match = ppm.ms2match, mz.ppm.thr = mz.ppm.thr)
-  
-  if (direction == 'reverse') {
-    idx.rm <- which(lib.spec[, 'intensity'] == 0)
-    if (length(idx.rm > 0)) {
-      pk.spec  <- pk.spec[-idx.rm, , drop = FALSE]
-      lib.spec <- lib.spec[-idx.rm, , drop = FALSE]
-    }
-  }
-  
-  return(list('exp' = pk.spec, 'lib' = lib.spec))
-}
-
-
-
-#-----------------------------------------------------------------------------
-###MatchFromTemp
-#@title MatchFromTemp
-#@description MatchFromTemp
-#@author Hao Li, Yandong Yin, Kai Weng
-#\email{shenxt@@sioc.ac.cn}
-#@param spec spec
-#@param temp temp
-#@export
-#'
-#' @title MatchFromTemp
-#' @export
-MatchFromTemp <- function(spec, temp) {
-  temp[match(spec[, 'mz'], temp[, 'mz']), 'intensity'] <- spec[, 'intensity']
-  temp
-}
-
-
-
-
-#-----------------------------------------------------------------------------
-###MatchSpec
-#@title MatchSpec
-#@description MatchSpec
-#@author Hao Li, Yandong Yin, Kai Weng
-#\email{shenxt@@sioc.ac.cn}
-#@param spec spec
-#@param ppm.ms2match ppm.ms2match
-#@param mz.ppm.thr mz.ppm.thr
-#@export
-#'
-
-#' @title MatchSpec
-#' @export
-MatchSpec <- function(spec, ppm.ms2match = 30, mz.ppm.thr = 400) {
-  while (TRUE) {
-    mz.diff.ppm <- GetDiffMZppm(spec[, 'mz'], mz.ppm.thr = mz.ppm.thr)
-    idx <- which(mz.diff.ppm < ppm.ms2match)
-    if (length(idx) > 0) {
-      i <- tail(idx, 1)
-      j <- which.max(spec[c(i, i + 1), 'intensity'])
-      spec[i, 'intensity'] <- spec[i + j - 1, 'intensity']
-      i2 <- i + 1
-      spec[i, 'mz'] <- spec[i2, 'mz']
-      spec <- spec[-i - 1, , drop = FALSE]
-    } else {
-      break
-    }
-  }
-  return(spec)
-}
-
-
-
-#-----------------------------------------------------------------------------
 #@title GetDiffMZppm
 #@description GetDiffMZppm
 #@author Hao Li, Yandong Yin, Kai Weng
@@ -221,155 +18,137 @@ GetDiffMZppm <- function(mz, mz.ppm.thr = NULL) {
 }
 
 
-
-#-----------------------------------------------------------------------------
-#@title GetWeightedInt
-#@description GetWeightedInt
-#@author Hao Li, Yandong Yin, Kai Weng
-#\email{shenxt@@sioc.ac.cn}
-#@param spec spec
-#@param weight.mz weight.mz
-#@param weight.int weight.int
-#@export
-#'
-
-#' @title GetWeightedInt
+####20190530
+# exp.spectrum <- exp.spectra
+# lib.spectrum <- exp.spectra
+###getSpectraMatchScore is used to get two MS2 spectra match score, see MS-DIAL
+#' @title getSpectraMatchScore
 #' @export
-GetWeightedInt <- function(spec, weight.mz = 0, weight.int = 1) {
-  return(spec[, 'mz'] ^ weight.mz * spec[, 'intensity'] ^ weight.int)
+getSpectraMatchScore <- function(exp.spectrum, 
+                                 lib.spectrum,
+                                 ppm.tol = 30,
+                                 mz.ppm.thr = 400){
+  exp.spectrum <- as.data.frame(exp.spectrum)
+  lib.spectrum <- as.data.frame(lib.spectrum)
+  
+  exp.spectrum$intensity <- exp.spectrum$intensity/max(exp.spectrum$intensity)  
+  lib.spectrum$intensity <- lib.spectrum$intensity/max(lib.spectrum$intensity)  
+  
+  match.matrix <- ms2Match(exp.spectrum = exp.spectrum, 
+                           lib.spectrum = lib.spectrum, 
+                           ppm.tol = ppm.tol, 
+                           mz.ppm.thr = mz.ppm.thr)
+  
+  fraction <- sum(!is.na(match.matrix$Lib.index) & !is.na(match.matrix$Exp.index))/nrow(match.matrix)
+  
+  dp.forward <- getDP(exp.int = match.matrix$Exp.intensity, 
+                      lib.int = match.matrix$Lib.intensity)
+  dp.reverse <- getDP(exp.int = match.matrix$Exp.intensity[which(match.matrix$Lib.intensity > 0)], 
+                      lib.int = match.matrix$Lib.intensity[which(match.matrix$Lib.intensity > 0)])
+  dp.forward[is.na(dp.forward)] <- 0
+  dp.reverse[is.na(dp.reverse)] <- 0
+  score <- dp.forward/3 + dp.reverse/3 + fraction/3
+  return(score)
 }
 
 
-#-----------------------------------------------------------------------------
-#'@title GetDotProduct
-#'@description GetDotProduct
-#'@author Hao Li, Yandong Yin, Kai Weng
-#'\email{shenxt@@sioc.ac.cn}
-#'@param x x
-#'@param y y
-#'@export
 
-GetDotProduct <- function(x, y) {
-  # return(sum(x * y) ^ 2 / (sum(x ^ 2) * sum(y ^ 2)))
-  return(sum(x * y) / sqrt((sum(x ^ 2) * sum(y ^ 2))))
+
+#####getDP is used to calculate dot product
+#' @title getDP
+#' @export
+getDP <- function(exp.int, lib.int){
+  exp.weight <- sapply(exp.int, function(x){
+    1/(1+x/(sum(exp.int) - 0.5))
+  })
+  lib.weight <- sapply(lib.int, function(x){
+    1/(1+x/(sum(lib.int) - 0.5))
+  })
+  x <- exp.weight * exp.int
+  y <- lib.weight * lib.int
+  return(sum(x * y) ^ 2 / (sum(x ^ 2) * sum(y ^ 2)))
 }
 
 
-#-----------------------------------------------------------------------------
-#' @title TuneMS2
+###ms2Match is used to match two MS2 spectra
+#' @title ms2Match
 #' @export
-TuneMS2 <- function(spec,
-                    mz.precursor,
-                    is.include.precursor = TRUE,
-                    snthr = 3,
-                    noise.ms2 = 3,
-                    mz.range.ms2 = NULL,
-                    int.ms2.min.abs,
-                    int.ms2.min.relative = 0.01,
-                    is.apply.ms2.min.relative = TRUE,
-                    is.check.sanity = TRUE,
-                    int.check.sanity = 50,
-                    ppm.precursor.filter = 20, ...) {
-  # re-orgnize spec with increasing mz
-  spec <- spec[order(spec[, 'mz']), , drop = FALSE]
-  # define the lowest non-noise signal
-  if (missing(int.ms2.min.abs)) {
-    int.ms2.min.abs <- noise.ms2 * snthr
-  }
-  #
-  # provent noise over estimation
-  if (is.check.sanity & int.ms2.min.abs > int.check.sanity) {
-    stop('Noise estimation is too high!')
-  }
+ms2Match <- function(exp.spectrum, 
+                     lib.spectrum,
+                     ppm.tol = 30,
+                     mz.ppm.thr = 400){
+  ##remove noisy fragments
+  exp.spectrum <- removeNoise(spec = exp.spectrum, 
+                              ppm.ms2match = ppm.tol, 
+                              mz.ppm.thr = mz.ppm.thr)
+  lib.spectrum <- removeNoise(spec = lib.spectrum, 
+                              ppm.ms2match = ppm.tol, 
+                              mz.ppm.thr = mz.ppm.thr)
   
-  # considering precursor ion
-  if (missing(mz.precursor)) {
-    mz.precursor <- max(spec[, 'mz'])
-  }
-  mz.precursor.range <- GetRangePPM(mz.precursor, ppm.precursor.filter)
-  idx.mz.precursor.range <- ifelse(is.include.precursor, 2, 1)
-  mz.cutoff <- mz.precursor.range[idx.mz.precursor.range]
-  spec <- spec[spec[,'mz'] < mz.cutoff, , drop = FALSE]
-  
-  if (nrow(spec) == 0) {
-    return()
-  }
-  
-  if (!is.null(mz.range.ms2)) {
-    nr.keep <- which(spec[, 'mz'] >= mz.range.ms2[1] &
-                       spec[, 'mz'] <= mz.range.ms2[2])
-    if (length(nr.keep) > 0) {
-      spec <- spec[nr.keep, , drop = FALSE]
+  ##for each fragment in lib.spectrum, its matched fragments index in exp.spectrum  
+  match.idx <- lapply(lib.spectrum$mz, function(x){
+    diff.mz <- abs(x - exp.spectrum$mz)
+    x[x < mz.ppm.thr] <- mz.ppm.thr
+    mz.error <- diff.mz*10^6/x
+    temp.idx <- which(mz.error < ppm.tol)
+    if(length(temp.idx) == 0) return(NA)
+    if(length(temp.idx) > 1) {
+      return(temp.idx[which.max(exp.spectrum$intensity[temp.idx])])
     }
-    else {
-      return()
-    }
+    return(temp.idx)
+  })
+  
+  match.idx <- do.call(rbind, match.idx)
+  match.idx <- cbind(1:nrow(match.idx), match.idx)
+  colnames(match.idx) <- c("Lib", "Exp")
+  
+  non.idx2 <- setdiff(c(1:nrow(exp.spectrum)), match.idx[,2][!is.na(match.idx[,2])])
+  
+  if(length(non.idx2) != 0){
+    match.idx2 <- data.frame(NA, non.idx2, stringsAsFactors = FALSE)
+    colnames(match.idx2) <- c('Lib', 'Exp')
+  }else{
+    match.idx2 <- NULL
   }
   
-  if ((max(spec[, 'intensity']) * int.ms2.min.relative) < int.ms2.min.abs) {
-    is.warning.lowspec <- TRUE
-  }
+  match.matrix <- as.data.frame(rbind(match.idx, match.idx2), stringsAsFactors = FALSE)
   
-  # discarding low intensity spec (1% highest int and int.ms2.min.abs)
-  int.cutoff <- max(max(spec[, 'intensity']) * int.ms2.min.relative,
-                    int.ms2.min.abs)
-  spec <- spec[spec[, 'intensity'] >= int.cutoff, , drop = FALSE]
-  if (nrow(spec) == 0) {
-    return()
-  }
   
-  # discarding ring effects
-  spec <- RemoveRingEffect(spec)
+  match.matrix <- data.frame(match.matrix, 
+                             lib.spectrum[match.matrix$Lib,],
+                             exp.spectrum[match.matrix$Exp,])
+  colnames(match.matrix) <- c("Lib.index", "Exp.index", "Lib.mz", "Lib.intensity",
+                              "Exp.mz", "Exp.intensity")
+  
+  match.matrix$Lib.intensity[is.na(match.matrix$Lib.intensity)] <- 0
+  match.matrix$Exp.intensity[is.na(match.matrix$Exp.intensity)] <- 0
+  rownames(match.matrix) <- NULL
+  match.matrix
 }
 
 
-#-----------------------------------------------------------------------------
-#' @title RemoveRingEffect
+###for a spectrum, if two fragments with the similar m/z, the fragment with the low fragment should be removed from
+##the spectrum
+#' @title removeNoise
 #' @export
-RemoveRingEffect <- function(spec, mz.diff.thr = 0.3, int.rel.thr = 0.2) {
-  nr.ring <- nrow(spec) + 1
-  mz <- spec[, 'mz']
-  
-  mz.diff <- diff(mz)
-  idx.mzdiff <- which(mz.diff <= mz.diff.thr)
-  if (length(idx.mzdiff) == 0) {
+removeNoise <- function(spec, ppm.ms2match = 30, 
+                        mz.ppm.thr = 400){
+  if(nrow(spec) == 1) return(spec)
+  spec <- spec[order(spec[,1]),]
+  mz <- spec[,1]
+  mz <- mz[-1]
+  diff.mz <- diff(spec[,1])
+  mz[which(mz < mz.ppm.thr)] <- mz.ppm.thr
+  mz.error <- diff.mz*10^6/mz
+  temp.idx <- which(mz.error < ppm.ms2match)
+  if(length(temp.idx) > 0){
+    remove.idx <- lapply(temp.idx, function(idx){
+      c(idx - 1, idx)[which.min(spec[c(idx - 1, idx), 2])]
+    })
+    
+    remove.idx <- unique(unlist(remove.idx))
+    spec <- spec[-remove.idx, , drop = FALSE]
+  }else{
     return(spec)
   }
-  
-  nr.ring.possible <- unique(c(idx.mzdiff, idx.mzdiff + 1))
-  while (TRUE) {
-    
-    idx.int.max <- which.max(spec[nr.ring.possible, 2])
-    nr.int.max <- nr.ring.possible[idx.int.max]
-    int.thr <- spec[nr.int.max, 2] * int.rel.thr
-    
-    mz.diff <- abs(mz[nr.ring.possible[-idx.int.max]] - mz[nr.int.max])
-    int <- spec[nr.ring.possible[-idx.int.max], 2]
-    nr.ring <- append(nr.ring, nr.ring.possible[-idx.int.max][which(mz.diff <= mz.diff.thr & int <= int.thr)])
-    nr.ring.possible <- nr.ring.possible[!nr.ring.possible %in% c(nr.ring, nr.int.max)]
-    if (length(nr.ring.possible) == 0) {
-      break
-    }
-  }
-  
-  return(spec[-nr.ring, , drop = FALSE])
 }
-
-
-#-----------------------------------------------------------------------------
-#' @title NormalizeSpec
-#' @export
-NormalizeSpec <- function(spec, ref = max(abs(spec[, 2])), pos = 'top') {
-  spec[, 2] <- spec[, 2] / ref * ifelse(pos == 'down', -1, 1)
-  return(spec)
-}
-
-
-
-#-----------------------------------------------------------------------------
-#' @title GetRangePPM
-#' @export
-GetRangePPM <- function(data, ppm) {
-  t(sapply(data, function(dt) dt * (1 + c(-1, 1) * ppm * 1e-6)))
-}
-#-----------------------------------------------------------------------------

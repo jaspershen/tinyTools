@@ -4,12 +4,7 @@
 \alias{removeNoise}
 \title{removeNoise}
 \usage{
-removeNoise(spec, mz.tol = 30)
-}
-\arguments{
-\item{spec}{}
-
-\item{mz.tol}{}
+removeNoise(spec, ppm.ms2match = 30, mz.ppm.thr = 400)
 }
 \description{
 removeNoise
