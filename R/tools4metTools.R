@@ -8,6 +8,7 @@
 #@export
 #' @title GetDiffMZppm
 #' @export
+
 GetDiffMZppm <- function(mz, mz.ppm.thr = NULL) {
   mz.diff <- diff(mz) / mz[-1] * 1e6
   if (!is.null(mz.ppm.thr)) {
@@ -17,7 +18,9 @@ GetDiffMZppm <- function(mz, mz.ppm.thr = NULL) {
   mz.diff
 }
 
-
+# getSpectraMatchScore(pk.spec, x, 
+#                      ppm.tol = ppm.ms2match,
+#                      mz.ppm.thr = mz.ppm.thr)
 ####20190530
 # exp.spectrum <- exp.spectra
 # lib.spectrum <- exp.spectra
@@ -143,7 +146,7 @@ removeNoise <- function(spec, ppm.ms2match = 30,
   temp.idx <- which(mz.error < ppm.ms2match)
   if(length(temp.idx) > 0){
     remove.idx <- lapply(temp.idx, function(idx){
-      c(idx - 1, idx)[which.min(spec[c(idx - 1, idx), 2])]
+      c(idx, idx + 1)[which.min(spec[c(idx, idx + 1), 2])]
     })
     
     remove.idx <- unique(unlist(remove.idx))
