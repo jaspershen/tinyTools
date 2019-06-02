@@ -76,6 +76,7 @@ getDP <- function(exp.int, lib.int){
 ###ms2Match is used to match two MS2 spectra
 #' @title ms2Match
 #' @export
+
 ms2Match <- function(exp.spectrum, 
                      lib.spectrum,
                      ppm.tol = 30,
@@ -118,8 +119,8 @@ ms2Match <- function(exp.spectrum,
   
   
   match.matrix <- data.frame(match.matrix, 
-                             lib.spectrum[match.matrix$Lib,],
-                             exp.spectrum[match.matrix$Exp,])
+                             lib.spectrum[match.matrix$Lib,c(1,2)],
+                             exp.spectrum[match.matrix$Exp,c(1,2)])
   colnames(match.matrix) <- c("Lib.index", "Exp.index", "Lib.mz", "Lib.intensity",
                               "Exp.mz", "Exp.intensity")
   
