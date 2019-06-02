@@ -5,7 +5,8 @@
 \title{getSpectraMatchScore}
 \usage{
 getSpectraMatchScore(exp.spectrum, lib.spectrum, ppm.tol = 30,
-  mz.ppm.thr = 400)
+  mz.ppm.thr = 400, fraction.weight = 0.2, dp.forward.weight = 0.7,
+  dp.reverse.weight = 0.1)
 }
 \description{
 getSpectraMatchScore

@@ -1,36 +1,23 @@
-#-----------------------------------------------------------------------------
-#@title GetDiffMZppm
-#@description GetDiffMZppm
-#@author Hao Li, Yandong Yin, Kai Weng
-#\email{shenxt@@sioc.ac.cn}
-#@param mz mz
-#@param mz.ppm.thr mz.ppm.thr
-#@export
-#' @title GetDiffMZppm
-#' @export
-
-GetDiffMZppm <- function(mz, mz.ppm.thr = NULL) {
-  mz.diff <- diff(mz) / mz[-1] * 1e6
-  if (!is.null(mz.ppm.thr)) {
-    idx <- which(mz[-1] <= mz.ppm.thr)
-    mz.diff[idx] <- mz.diff[idx] * mz[-1] / mz.ppm.thr
-  }
-  mz.diff
-}
 
 # getSpectraMatchScore(pk.spec, x, 
 #                      ppm.tol = ppm.ms2match,
 #                      mz.ppm.thr = mz.ppm.thr)
 ####20190530
-# exp.spectrum <- exp.spectra
-# lib.spectrum <- exp.spectra
+# exp.spectrum <- exp.spectrum
+# lib.spectrum <- lib.spectrum
+# ppm.tol = 30
+# mz.ppm.thr = 400
 ###getSpectraMatchScore is used to get two MS2 spectra match score, see MS-DIAL
 #' @title getSpectraMatchScore
 #' @export
 getSpectraMatchScore <- function(exp.spectrum, 
                                  lib.spectrum,
                                  ppm.tol = 30,
-                                 mz.ppm.thr = 400){
+                                 mz.ppm.thr = 400,
+                                 fraction.weight = 0.2,
+                                 dp.forward.weight = 0.7,
+                                 dp.reverse.weight = 0.1
+){
   exp.spectrum <- as.data.frame(exp.spectrum)
   lib.spectrum <- as.data.frame(lib.spectrum)
   
@@ -50,7 +37,7 @@ getSpectraMatchScore <- function(exp.spectrum,
                       lib.int = match.matrix$Lib.intensity[which(match.matrix$Lib.intensity > 0)])
   dp.forward[is.na(dp.forward)] <- 0
   dp.reverse[is.na(dp.reverse)] <- 0
-  score <- dp.forward/3 + dp.reverse/3 + fraction/3
+  score <- dp.forward * dp.forward.weight + dp.reverse * dp.reverse.weight + fraction * fraction.weight
   return(score)
 }
 
