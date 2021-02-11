@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://jaspershen.github.io/tinyTools//index.html</loc>
+  </url>
+  <url>
+    <loc>https://jaspershen.github.io/tinyTools//reference/getDP.html</loc>
+  </url>
+  <url>
+    <loc>https://jaspershen.github.io/tinyTools//reference/getSpectraMatchScore.html</loc>
+  </url>
+  <url>
+    <loc>https://jaspershen.github.io/tinyTools//reference/ms2Match.html</loc>
+  </url>
+  <url>
+    <loc>https://jaspershen.github.io/tinyTools//reference/removeNoise.html</loc>
+  </url>
+  <url>
+    <loc>https://jaspershen.github.io/tinyTools//reference/split_formula.html</loc>
+  </url>
+  <url>
+    <loc>https://jaspershen.github.io/tinyTools//reference/sum_formula.html</loc>
+  </url>
+</urlset>
