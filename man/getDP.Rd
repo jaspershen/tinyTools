@@ -6,6 +6,11 @@
 \usage{
 getDP(exp.int, lib.int)
 }
+\arguments{
+\item{exp.int}{exp.int}
+
+\item{lib.int}{lib.int}
+}
 \description{
 getDP
 }

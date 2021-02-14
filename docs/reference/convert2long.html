@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ms2Match — ms2Match • tinyTools</title>
+<title>convert2long — convert2long • tinyTools</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -52,8 +52,8 @@
 
 
 
-<meta property="og:title" content="ms2Match — ms2Match" />
-<meta property="og:description" content="ms2Match" />
+<meta property="og:title" content="convert2long — convert2long" />
+<meta property="og:description" content="Convert from wide data to long data." />
 <meta property="og:image" content="https://jaspershen.github.io/tinyTools/logo.png" />
 
 
@@ -199,38 +199,38 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>ms2Match</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jaspershen/sxtTools/blob/master/R/tools4metTools.R'><code>R/tools4metTools.R</code></a></small>
-    <div class="hidden name"><code>ms2Match.Rd</code></div>
+    <h1>convert2long</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jaspershen/sxtTools/blob/master/R/long_wide_convertor.R'><code>R/long_wide_convertor.R</code></a></small>
+    <div class="hidden name"><code>convert2long.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>ms2Match</p>
+    <p>Convert from wide data to long data.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ms2Match</span><span class='op'>(</span><span class='va'>exp.spectrum</span>, <span class='va'>lib.spectrum</span>, ppm.tol <span class='op'>=</span> <span class='fl'>30</span>, mz.ppm.thr <span class='op'>=</span> <span class='fl'>400</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>convert2long</span><span class='op'>(</span><span class='va'>expression_data</span>, <span class='va'>sample_info</span>, <span class='va'>variable_info</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>exp.spectrum</th>
-      <td><p>exp.spectrum</p></td>
+      <th>expression_data</th>
+      <td><p>expression_data</p></td>
     </tr>
     <tr>
-      <th>lib.spectrum</th>
-      <td><p>lib.spectrum</p></td>
+      <th>sample_info</th>
+      <td><p>sample_info</p></td>
     </tr>
     <tr>
-      <th>ppm.tol</th>
-      <td><p>ppm.tol</p></td>
-    </tr>
-    <tr>
-      <th>mz.ppm.thr</th>
-      <td><p>mz.ppm.thr</p></td>
+      <th>variable_info</th>
+      <td><p>variable_info</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Xiaotao Shen
+<a href='mailto:shenxt@stanford.edu'>shenxt@stanford.edu</a></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

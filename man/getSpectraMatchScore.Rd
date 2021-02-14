@@ -14,6 +14,21 @@ getSpectraMatchScore(
   dp.reverse.weight = 0.1
 )
 }
+\arguments{
+\item{exp.spectrum}{exp.spectrum}
+
+\item{lib.spectrum}{lib.spectrum}
+
+\item{ppm.tol}{ppm.tol}
+
+\item{mz.ppm.thr}{mz.ppm.thr}
+
+\item{fraction.weight}{fraction.weight}
+
+\item{dp.forward.weight}{dp.forward.weight}
+
+\item{dp.reverse.weight}{dp.reverse.weight}
+}
 \description{
 getSpectraMatchScore
 }

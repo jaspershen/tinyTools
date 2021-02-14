@@ -6,6 +6,15 @@
 \usage{
 ms2Match(exp.spectrum, lib.spectrum, ppm.tol = 30, mz.ppm.thr = 400)
 }
+\arguments{
+\item{exp.spectrum}{exp.spectrum}
+
+\item{lib.spectrum}{lib.spectrum}
+
+\item{ppm.tol}{ppm.tol}
+
+\item{mz.ppm.thr}{mz.ppm.thr}
+}
 \description{
 ms2Match
 }

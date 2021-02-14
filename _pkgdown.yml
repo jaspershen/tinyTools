@@ -23,11 +23,16 @@ template:
     ganalytics: UA-000000-01
 
 reference:
-  - title: Functions
-    desc: Functions in tidymas
+  - title: Formula operation
+    desc: Formula operation
     contents:
     - split_formula
     - sum_formula
+  - title: Convert long and wide data
+    desc: Convert long and wide data
+    contents:
+    - convert2long
+    - convert2wide
 
 navbar:
   title: "sparklyr"
