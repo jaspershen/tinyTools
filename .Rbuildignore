@@ -9,3 +9,5 @@ NEWS.md
 ^docs$
 ^pkgdown$
 .git
+^\.github$
+.gitignore

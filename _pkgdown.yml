@@ -33,6 +33,11 @@ reference:
     contents:
     - convert2long
     - convert2wide
+  - title: Work directory operation
+    desc: Work directory operation
+    contents:
+    - setwd_win
+    - setwd_project
 
 navbar:
   title: "sparklyr"
