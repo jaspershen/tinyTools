@@ -11,3 +11,4 @@ NEWS.md
 .git
 ^\.github$
 .gitignore
+logo.txt

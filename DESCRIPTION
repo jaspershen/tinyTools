@@ -1,14 +1,23 @@
 Package: tinyTools
+Type: Package
 Title: All the usefull tools from Xiaotao Shen
-Version: 0.01.02
+Version: 0.9.0
 Date: 2019-05-30
 Authors@R: c(
-    person("Xiaotao", "Shen", , "shenxt1990@163.com", role = c("aut", "cre"), 
-      comment = c(ORCID = "0000-0002-9608-9964")
-    )
-    )
+    person(given = "Xiaotao",
+           family = "Shen",
+           role = c("aut", "cre"),
+           email = "shenxt@stanford.edu",
+           comment = c(ORCID = "0000-0002-9608-9964")),
+        person(given = "Chuchu",
+           family = "Wang",
+           role = c("aut", "ctb"))
+           )
 Maintainer: Xiaotao Shen<shenxt1990@163.com>
 Description: Small tools of Xiaotao Shen.
+URL: https://github.com/jaspershen/metPath
+BugReports: https://github.com/jaspershen/metPath/issues
+Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.0)
 Imports: 
@@ -16,15 +25,23 @@ Imports:
     magrittr,
     tibble,
     tidyr,
-    stringr
+    stringr,
+    rstudioapi,
+    ggplot2,
+    methods,
+    crayon,
+    cli,
+    plotly,
+    pbapply
 License: GPL-2 | file LICENSE
-URL: https://github.com/jaspershen/sxtTools
 RoxygenNote: 7.1.1
-Suggests: knitr,
+Suggests: 
+    knitr,
     rmarkdown,
     BiocStyle,
     RUnit,
     BiocGenerics,
-    tidyverse,
-    ggplot2
+    tidyverse
 VignetteBuilder: knitr
+Note:
+biocViews: Metabolomics, MassSpectrometry, Data processing, Data analysis.

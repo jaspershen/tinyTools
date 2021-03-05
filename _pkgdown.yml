@@ -38,12 +38,24 @@ reference:
     contents:
     - setwd_win
     - setwd_project
+  - title: MS2 spectrum
+    desc: MS2 spectrum
+    contents:
+    - msMatch
+    - ms2_plot
+    - getDP
+  - title: Other tools
+    desc: Other tools
+    contents:
+    - tinyTools_logo
+    - mz_rt_match
+    - keep_one
 
 navbar:
   title: "sparklyr"
   # type: inverse
   structure:
-    left: [home, references, articles, news]
+    left: [home, references, articles, news, contact]
     right: [github, twitter]
   components:
     articles:
@@ -75,6 +87,9 @@ navbar:
     twitter:
       icon: "fab fa-twitter fa-lg"
       href: https://twitter.com/JasperShen1990
+    contact:
+      text: Contact us
+      href: articles/contact_us.html
     news:
       text: News
       menu:
