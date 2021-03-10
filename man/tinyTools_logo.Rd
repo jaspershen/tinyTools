@@ -9,6 +9,9 @@ tinyTools_logo()
 \description{
 Get the detailed of metPath package.
 }
+\examples{
+tinyTools_logo()
+}
 \author{
 Xiaotao Shen
 \email{shenxt@stanford.edu}

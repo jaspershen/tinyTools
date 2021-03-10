@@ -149,7 +149,7 @@ removeNoise <- function(spec,
                         mz.ppm.thr = 400) {
   if (nrow(spec) == 1)
     return(spec)
-  spec <- spec[order(spec[, 1]), ]
+  spec <- spec[order(spec[, 1]),]
   mz <- spec[, 1]
   mz <- mz[-1]
   diff.mz <- diff(spec[, 1])
@@ -167,3 +167,62 @@ removeNoise <- function(spec,
     return(spec)
   }
 }
+
+
+# # NOTE: keep in sync with install-patRoon version
+# findPWizPath <- function() {
+#   # try to find ProteoWizard
+#   # order: options --> win registry --> PATH
+#   # the PATH is searched last because OpenMS might have added its own old version.
+#   
+#   path <- getOption("patRoon.path.pwiz")
+#   if (!is.null(path) && nzchar(path))
+#     return(path)
+#   
+#   if (Sys.info()[["sysname"]] == "Windows")
+#   {
+#     # Inspired by scan_registry_for_rtools() from pkgload
+#     key <- "Directory\\shell\\Open with SeeMS\\command"
+#     reg <-
+#       tryCatch(
+#         utils::readRegistry(key, "HCR"),
+#         error = function(e)
+#           NULL
+#       )
+#     
+#     # not sure if this might occur
+#     if (is.null(reg))
+#       reg <-
+#       tryCatch(
+#         utils::readRegistry(key, "HLM"),
+#         error = function(e)
+#           NULL
+#       )
+#     
+#     if (!is.null(reg))
+#     {
+#       path <-
+#         tryCatch(
+#           dirname(sub("\"([^\"]*)\".*", "\\1", reg[[1]])),
+#           error = function(e)
+#             NULL
+#         )
+#       if (!is.null(path) &&
+#           file.exists(file.path(path, "msconvert.exe")))
+#         # extra check: see if msconvert is there
+#         return(path)
+#     }
+#   }
+#   
+#   # check PATH
+#   msc <-
+#     if (Sys.info()[["sysname"]] == "Windows")
+#       "msconvert.exe"
+#   else
+#     "msconvert"
+#   path <- dirname(Sys.which(msc))
+#   if (nzchar(path))
+#     return(path)
+#   
+#   return(NULL)
+# }

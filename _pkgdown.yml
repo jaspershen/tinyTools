@@ -38,6 +38,10 @@ reference:
     contents:
     - setwd_win
     - setwd_project
+  - title: System
+    desc: System
+    contents:
+    - get_os
   - title: MS2 spectrum
     desc: MS2 spectrum
     contents:
