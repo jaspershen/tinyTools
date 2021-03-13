@@ -17,3 +17,101 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(tinyTools)
 ```
+
+## **Compound ID converter**
+
+Two web tools are used for compound compound convert.
+
+### **1. cts.fiehnlab**
+
+cts.fiehnlab is http://cts.fiehnlab.ucdavis.edu/service/convert. It support a lot of databases. 
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+library(tinyTools)
+```
+
+We can use the `trans_id_database()` to get the databases that cts.fiehnlab.
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+database_name = trans_id_database(server = "cts.fiehnlab")
+```
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+head(database_name$From$From)
+```
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+head(database_name$To$From)
+```
+
+We can see that it support a lot of (> 200) databases.
+
+We can try the most common convert, from KEGG to HMDB.
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+trans_ID(
+  query = "C00001",
+  from = "KEGG",
+  to = "Human Metabolome Database",
+  top = 1,
+  server = "cts.fiehnlab"
+)
+```
+
+Now, `trans_ID` doesn't support verctor query. So you can use the `purrr::map()` to achive this.
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+c("C00001", "C00001", "C00001") %>%
+  purrr::map(
+    .f = function(x) {
+      trans_ID(
+        query = x,
+        from = "KEGG",
+        to = "Human Metabolome Database",
+        top = 1,
+        server = "cts.fiehnlab"
+      )
+    }
+  ) %>%
+  do.call(rbind, .) %>%
+  as.data.frame()
+```
+
+### **2. chemspider**
+
+This is from https://www.chemspider.com/InChI.asmx. 
+
+We can use the `trans_id_database()` to get the databases that chemspider
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+database_name2 = trans_id_database(server = "chemspider")
+```
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+database_name2$From
+```
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+database_name2$To
+```
+
+This is very useful if you want to get the inchikey, inchi or smiles for one compound. But this web only support "ChemSpider ID" (csid), so we need use cts.fiehnlab convert to csid first.
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+trans_ID(
+  query = "C00001",
+  from = "KEGG",
+  to = "ChemSpider",
+  top = 1,
+  server = "cts.fiehnlab"
+)
+```
+
+```{r,eval=TRUE,warning=FALSE, R.options="", message=FALSE}
+trans_ID(
+  query = "140526",
+  from = "csid",
+  to = "mol",
+  top = 1,
+  server = "chemspider"
+)
+```

@@ -172,11 +172,114 @@
 <span class="co">#&gt; More information can be found at https://jaspershen.github.io/tinyTools/</span>
 <span class="co">#&gt; Authors: Xiaotao Shen (shenxt@stanford.edu)</span>
 <span class="co">#&gt; Maintainer: Xiaotao Shen</span></code></pre></div>
+<div id="compound-id-converter" class="section level2">
+<h2 class="hasAnchor">
+<a href="#compound-id-converter" class="anchor"></a><strong>Compound ID converter</strong>
+</h2>
+<p>Two web tools are used for compound compound convert.</p>
+<div id="cts-fiehnlab" class="section level3">
+<h3 class="hasAnchor">
+<a href="#cts-fiehnlab" class="anchor"></a><strong>1. cts.fiehnlab</strong>
+</h3>
+<p>cts.fiehnlab is <a href="http://cts.fiehnlab.ucdavis.edu/service/convert" class="uri">http://cts.fiehnlab.ucdavis.edu/service/convert</a>. It support a lot of databases.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jaspershen/metPath">tinyTools</a></span><span class="op">)</span></code></pre></div>
+<p>We can use the <code><a href="../reference/trans_id_database.html">trans_id_database()</a></code> to get the databases that cts.fiehnlab.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">database_name</span> <span class="op">=</span> <span class="fu"><a href="../reference/trans_id_database.html">trans_id_database</a></span><span class="op">(</span>server <span class="op">=</span> <span class="st">"cts.fiehnlab"</span><span class="op">)</span>
+<span class="co">#&gt; 225 databases are supported in server http://cts.fiehnlab.ucdavis.edu/service/convert for 'from'.</span>
+<span class="co">#&gt; 226 databases are supported in server http://cts.fiehnlab.ucdavis.edu/service/convert for 'to'.</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">database_name</span><span class="op">$</span><span class="va">From</span><span class="op">$</span><span class="va">From</span><span class="op">)</span>
+<span class="co">#&gt; [1] "AAA Chemistry"     "ABBLIS Chemicals"  "Abbott Labs"      </span>
+<span class="co">#&gt; [4] "ABI Chem"          "AbMole Bioscience" "Acesobio"</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">database_name</span><span class="op">$</span><span class="va">To</span><span class="op">$</span><span class="va">From</span><span class="op">)</span>
+<span class="co">#&gt; [1] "AAA Chemistry"     "ABBLIS Chemicals"  "Abbott Labs"      </span>
+<span class="co">#&gt; [4] "ABI Chem"          "AbMole Bioscience" "Acesobio"</span></code></pre></div>
+<p>We can see that it support a lot of (&gt; 200) databases.</p>
+<p>We can try the most common convert, from KEGG to HMDB.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/trans_ID.html">trans_ID</a></span><span class="op">(</span>
+  query <span class="op">=</span> <span class="st">"C00001"</span>,
+  from <span class="op">=</span> <span class="st">"KEGG"</span>,
+  to <span class="op">=</span> <span class="st">"Human Metabolome Database"</span>,
+  top <span class="op">=</span> <span class="fl">1</span>,
+  server <span class="op">=</span> <span class="st">"cts.fiehnlab"</span>
+<span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   KEGG   `Human Metabolome Database`</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                      </span>
+<span class="co">#&gt; 1 C00001 HMDB0002111</span></code></pre></div>
+<p>Now, <code>trans_ID</code> doesn’t support verctor query. So you can use the <code><a href="https://purrr.tidyverse.org/reference/map.html">purrr::map()</a></code> to achive this.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C00001"</span>, <span class="st">"C00001"</span>, <span class="st">"C00001"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span>
+    .f <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
+      <span class="fu"><a href="../reference/trans_ID.html">trans_ID</a></span><span class="op">(</span>
+        query <span class="op">=</span> <span class="va">x</span>,
+        from <span class="op">=</span> <span class="st">"KEGG"</span>,
+        to <span class="op">=</span> <span class="st">"Human Metabolome Database"</span>,
+        top <span class="op">=</span> <span class="fl">1</span>,
+        server <span class="op">=</span> <span class="st">"cts.fiehnlab"</span>
+      <span class="op">)</span>
+    <span class="op">}</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt;     KEGG Human Metabolome Database</span>
+<span class="co">#&gt; 1 C00001               HMDB0002111</span>
+<span class="co">#&gt; 2 C00001               HMDB0002111</span>
+<span class="co">#&gt; 3 C00001               HMDB0002111</span></code></pre></div>
+</div>
+<div id="chemspider" class="section level3">
+<h3 class="hasAnchor">
+<a href="#chemspider" class="anchor"></a><strong>2. chemspider</strong>
+</h3>
+<p>This is from <a href="https://www.chemspider.com/InChI.asmx" class="uri">https://www.chemspider.com/InChI.asmx</a>.</p>
+<p>We can use the <code><a href="../reference/trans_id_database.html">trans_id_database()</a></code> to get the databases that chemspider</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">database_name2</span> <span class="op">=</span> <span class="fu"><a href="../reference/trans_id_database.html">trans_id_database</a></span><span class="op">(</span>server <span class="op">=</span> <span class="st">"chemspider"</span><span class="op">)</span>
+<span class="co">#&gt; 9 are supported in server https://www.chemspider.com/InChI.asmx.</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">database_name2</span><span class="op">$</span><span class="va">From</span>
+<span class="co">#&gt; [1] "csid"     "inchikey" "inchikey" "inchikey" "inchi"    "inchi"    "inchi"   </span>
+<span class="co">#&gt; [8] "inchi"    "smiles"</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">database_name2</span><span class="op">$</span><span class="va">To</span>
+<span class="co">#&gt; [1] "mol"      "csid"     "inchi"    "mol"      "csid"     "inchikey" "mol"     </span>
+<span class="co">#&gt; [8] "smiles"   "inchi"</span></code></pre></div>
+<p>This is very useful if you want to get the inchikey, inchi or smiles for one compound. But this web only support “ChemSpider ID” (csid), so we need use cts.fiehnlab convert to csid first.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/trans_ID.html">trans_ID</a></span><span class="op">(</span>
+  query <span class="op">=</span> <span class="st">"C00001"</span>,
+  from <span class="op">=</span> <span class="st">"KEGG"</span>,
+  to <span class="op">=</span> <span class="st">"ChemSpider"</span>,
+  top <span class="op">=</span> <span class="fl">1</span>,
+  server <span class="op">=</span> <span class="st">"cts.fiehnlab"</span>
+<span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   KEGG   ChemSpider</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 C00001 140526</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/trans_ID.html">trans_ID</a></span><span class="op">(</span>
+  query <span class="op">=</span> <span class="st">"140526"</span>,
+  from <span class="op">=</span> <span class="st">"csid"</span>,
+  to <span class="op">=</span> <span class="st">"mol"</span>,
+  top <span class="op">=</span> <span class="fl">1</span>,
+  server <span class="op">=</span> <span class="st">"chemspider"</span>
+<span class="op">)</span>
+<span class="co">#&gt; [1] NA</span></code></pre></div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

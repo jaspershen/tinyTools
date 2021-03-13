@@ -5,14 +5,14 @@
 #' @importFrom stringr str_replace str_split str_replace_all str_trim
 #' @importFrom dplyr filter mutate select everything
 #' @importFrom rstudioapi isAvailable hasFun getThemeInfo
-#' @importFrom utils packageDescription
+#' @importFrom utils packageDescription write.csv
 #' @importFrom cli rule symbol
 #' @importFrom crayon green blue col_align red black white style make_style num_colors
 #' @importFrom plotly ggplotly
 #' @importFrom pbapply pblapply
 #' @import ggplot2
 #' @importFrom methods .hasSlot new
-#' @importFrom stats p.adjust
+#' @importFrom stats p.adjust rgamma
 #' @importFrom utils data str
 #' @importFrom magrittr %>%
 #' @export

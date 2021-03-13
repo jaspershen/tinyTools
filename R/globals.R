@@ -1,1 +1,1 @@
-utils::globalVariables(c("variable_id", "sample_id", "value"))
+utils::globalVariables(c("variable_id", "sample_id", "value", ".", "name"))
